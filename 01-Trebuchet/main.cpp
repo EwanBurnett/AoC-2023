@@ -6,7 +6,6 @@
  *  Created: 01-12-23    Ewan Burnett
  *  Revised: 01-12-23    Ewan Burnett
  */
-
 #define PART_1 0
 
 #include <cstdio>
@@ -17,7 +16,6 @@
 #include <stdexcept>
 
 std::vector<std::string> g_InputData;
-
 void LoadInputData(const std::string& inFile, std::vector<std::string>& outData) {
     //Attempt to open the file. 
     std::fstream file;
@@ -33,7 +31,7 @@ void LoadInputData(const std::string& inFile, std::vector<std::string>& outData)
 
     std::string line;
     while (std::getline(file, line)) {
-        
+
         //Convert the string to lowercase.
         std::string lwr;
         lwr.resize(line.length());
@@ -41,7 +39,7 @@ void LoadInputData(const std::string& inFile, std::vector<std::string>& outData)
             lwr[i] = std::tolower(line[i]);
         }
 
-        outData.push_back(lwr);  
+        outData.push_back(lwr);
     }
 
     return;
@@ -95,7 +93,8 @@ uint64_t ComputeCalibrationValues_Part1(const std::vector<std::string>& data) {
             //Promote the numbers to 2 digits, and add to the accumulator. 
             auto cal = (first * 10) + last;
             printf("%d\t%s\n", cal, v.data());
-            acc += cal;             }
+            acc += cal;
+        }
     }
 
     return acc;
@@ -103,8 +102,8 @@ uint64_t ComputeCalibrationValues_Part1(const std::vector<std::string>& data) {
 
 #else
 /*  Computes the sum Calibration Values from a given input data array
- *  from the first and last numerical values of each element, including 
- *  numbers spelled out in English.  
+ *  from the first and last numerical values of each element, including
+ *  numbers spelled out in English.
  *  e.g. the string "eightwothree" would give first = 8, last = 3, value = 83
  *  e.g. the string "zoneight234" would give first = 1, last = 4, value = 14
   */
@@ -112,11 +111,22 @@ uint64_t ComputeCalibrationValues_Part2(const std::vector<std::string>& data) {
 
     uint64_t acc = 0;
 
+    //utility lambda to compare two substrings. 
+    //NOTE: this is unsafe, as no bounds checking is performed. 
+    auto compareString = [](const char* pA, const char* pB, const uint8_t length) {
+        for (uint8_t i = 0; i < length; i++) {
+            if (pA[i] != pB[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    int8_t first = -1;
+    int8_t last = -1;
     for (const auto& str : data) {
         std::string_view v{str};    //Acquire a view of the string we're processing. 
-
-        int8_t first = -1;
-        int8_t last = -1;
 
         //crawl through the string, checking each element for an integer.
         for (size_t i = 0; i < v.length(); i++) {
@@ -129,53 +139,53 @@ uint64_t ComputeCalibrationValues_Part2(const std::vector<std::string>& data) {
                 }
 
                 //Compare the string with potential values. 
-               switch(v[i]){
+                switch (v[i]) {
                 case 'o':
-                    if (std::strcmp(&v[i], "one") == 0) {
+                    if (compareString(&v[i], "one", 3)) {
                         first = 1;
-                    break;
+                        break;
                     }
                     continue;
                 case 't':
-                    if (std::strcmp(&v[i], "two") == 0) {
+                    if (compareString(&v[i], "two", 3)) {
                         first = 2;
                         break;
                     }
-                    else if (std::strcmp(&v[i], "three") == 0) {
+                    else if (compareString(&v[i], "three", 5)) {
                         first = 3;
                         break;
                     }
                     continue;
                 case 'f':
-                    if (std::strcmp(&v[i], "four") == 0) {
+                    if (compareString(&v[i], "four", 4)) {
                         first = 4;
                         break;
                     }
-                    else if (std::strcmp(&v[i], "five") == 0) {
+                    else if (compareString(&v[i], "five", 4)) {
                         first = 5;
-                    break;
+                        break;
                     }
                     continue;
-             case 's':
-                    if (std::strcmp(&v[i], "six") == 0) {
+                case 's':
+                    if (compareString(&v[i], "six", 3)) {
                         first = 6;
                         break;
                     }
-                    else if (std::strcmp(&v[i], "seven") == 0) {
+                    else if (compareString(&v[i], "seven", 5)) {
                         first = 7;
-                    break;
+                        break;
                     }
                     continue;
-             case 'e':
-                    if (std::strcmp(&v[i], "eight") == 0) {
+                case 'e':
+                    if (compareString(&v[i], "eight", 5)) {
                         first = 8;
-                    break;
+                        break;
                     }
                     continue;
-             case 'n':
-                    if (std::strcmp(&v[i], "nine") == 0) {
+                case 'n':
+                    if (compareString(&v[i], "nine", 4)) {
                         first = 9;
-                    break;
+                        break;
                     }
                     continue;
                 default:
@@ -195,7 +205,7 @@ uint64_t ComputeCalibrationValues_Part2(const std::vector<std::string>& data) {
         }
 
         //Do the same, but backwards through the string.
-        for (size_t i = v.length() - 1; i > 0; i--) {
+        for (size_t i = v.length() - 1; i >= 0; i--) {
             if (v[i] < '0') {
                 continue;   //Ignore special characters
             }
@@ -205,53 +215,53 @@ uint64_t ComputeCalibrationValues_Part2(const std::vector<std::string>& data) {
                 }
 
                 //Compare the string with potential values. 
-                switch(v[i]){
+                switch (v[i]) {
                 case 'o':
-                    if (std::strcmp(&v[i], "one") == 0) {
+                    if (compareString(&v[i], "one", 3)) {
                         last = 1;
-                    break;
+                        break;
                     }
                     continue;
                 case 't':
-                    if (std::strcmp(&v[i], "two") == 0) {
+                    if (compareString(&v[i], "two", 3)) {
                         last = 2;
                         break;
                     }
-                    else if (std::strcmp(&v[i], "three") == 0) {
+                    else if (compareString(&v[i], "three", 5)) {
                         last = 3;
                         break;
                     }
                     continue;
                 case 'f':
-                    if (std::strcmp(&v[i], "four") == 0) {
+                    if (compareString(&v[i], "four", 4)) {
                         last = 4;
                         break;
                     }
-                    else if (std::strcmp(&v[i], "five") == 0) {
+                    else if (compareString(&v[i], "five", 4)) {
                         last = 5;
-                    break;
+                        break;
                     }
                     continue;
-             case 's':
-                    if (std::strcmp(&v[i], "six") == 0) {
+                case 's':
+                    if (compareString(&v[i], "six", 3)) {
                         last = 6;
                         break;
                     }
-                    else if (std::strcmp(&v[i], "seven") == 0) {
+                    else if (compareString(&v[i], "seven", 5)) {
                         last = 7;
-                    break;
+                        break;
                     }
                     continue;
-             case 'e':
-                    if (std::strcmp(&v[i], "eight") == 0) {
+                case 'e':
+                    if (compareString(&v[i], "eight", 5)) {
                         last = 8;
-                    break;
+                        break;
                     }
                     continue;
-             case 'n':
-                    if (std::strcmp(&v[i], "nine") == 0) {
+                case 'n':
+                    if (compareString(&v[i], "nine", 4)) {
                         last = 9;
-                    break;
+                        break;
                     }
                     continue;
                 default:
@@ -267,11 +277,17 @@ uint64_t ComputeCalibrationValues_Part2(const std::vector<std::string>& data) {
             }
         }
 
+
         if (first > -1 && last > -1) {   //Only add to the accumulator if a value has been found. 
             //Promote the numbers to 2 digits, and add to the accumulator. 
             auto cal = (first * 10) + last;
-            printf("%d\t%s\n", cal, v.data());
-            acc += cal;             }
+            printf("[%d]\t%d\t%s\n", acc, cal, v.data());
+            acc += cal;
+
+
+        }
+        first = -1;
+        last = -1;
     }
 
     return acc;
@@ -305,4 +321,5 @@ int main(int argc, const char** argv) {
         printf("Error:\t%s", e.what());
     }
 
+    return 0;
 }
