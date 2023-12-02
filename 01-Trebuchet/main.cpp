@@ -4,7 +4,7 @@
  *  last digits in the string, then compute their sum.
  *  ----------
  *  Created: 01-12-23    Ewan Burnett
- *  Revised: 01-12-23    Ewan Burnett
+ *  Revised: 02-12-23    Ewan Burnett
  */
 #define PART_1 0
 
@@ -41,6 +41,8 @@ void LoadInputData(const std::string& inFile, std::vector<std::string>& outData)
 
         outData.push_back(lwr);
     }
+
+    file.close(); 
 
     return;
 }
@@ -111,17 +113,78 @@ uint64_t ComputeCalibrationValues_Part2(const std::vector<std::string>& data) {
 
     uint64_t acc = 0;
 
-    //utility lambda to compare two substrings. 
-    //NOTE: this is unsafe, as no bounds checking is performed. 
-    auto compareString = [](const char* pA, const char* pB, const uint8_t length) {
-        for (uint8_t i = 0; i < length; i++) {
-            if (pA[i] != pB[i]) {
-                return false;
+    //Compare the string with potential values. 
+    auto getDigit = [](const char* str, int8_t& val) {
+        //utility lambda to compare two substrings. 
+        //NOTE: this is unsafe, as no bounds checking is performed. 
+        //If this is being called, then the first token has already been successfully validated. 
+        auto compareString = [](const char* pA, const char* pB, const uint8_t length) {
+            for (uint8_t i = 1; i < length; i++) {
+                if (pA[i] != pB[i]) {
+                    return false;
+                }
             }
+
+            return true;
+        };
+
+
+        switch (str[0]) {
+        case 'o':
+            if (compareString(str, "one", 3)) {
+                val = 1;
+                break;
+            }
+            return false;
+        case 't':
+            if (compareString(str, "two", 3)) {
+                val = 2;
+                break;
+            }
+            else if (compareString(str, "three", 5)) {
+                val = 3;
+                break;
+            }
+            return false;
+        case 'f':
+            if (compareString(str, "four", 4)) {
+                val = 4;
+                break;
+            }
+            else if (compareString(str, "five", 4)) {
+                val = 5;
+                break;
+            }
+            return false;
+        case 's':
+            if (compareString(str, "six", 3)) {
+                val = 6;
+                break;
+            }
+            else if (compareString(str, "seven", 5)) {
+                val = 7;
+                break;
+            }
+            return false;
+        case 'e':
+            if (compareString(str, "eight", 5)) {
+                val = 8;
+                break;
+            }
+            return false;
+        case 'n':
+            if (compareString(str, "nine", 4)) {
+                val = 9;
+                break;
+            }
+            return false;
+        default:
+            return false;
         }
 
-        return true;
+        return true; 
     };
+
 
     int8_t first = -1;
     int8_t last = -1;
@@ -138,59 +201,12 @@ uint64_t ComputeCalibrationValues_Part2(const std::vector<std::string>& data) {
                     continue;   //the character is either uppercase or a special character
                 }
 
-                //Compare the string with potential values. 
-                switch (v[i]) {
-                case 'o':
-                    if (compareString(&v[i], "one", 3)) {
-                        first = 1;
-                        break;
-                    }
-                    continue;
-                case 't':
-                    if (compareString(&v[i], "two", 3)) {
-                        first = 2;
-                        break;
-                    }
-                    else if (compareString(&v[i], "three", 5)) {
-                        first = 3;
-                        break;
-                    }
-                    continue;
-                case 'f':
-                    if (compareString(&v[i], "four", 4)) {
-                        first = 4;
-                        break;
-                    }
-                    else if (compareString(&v[i], "five", 4)) {
-                        first = 5;
-                        break;
-                    }
-                    continue;
-                case 's':
-                    if (compareString(&v[i], "six", 3)) {
-                        first = 6;
-                        break;
-                    }
-                    else if (compareString(&v[i], "seven", 5)) {
-                        first = 7;
-                        break;
-                    }
-                    continue;
-                case 'e':
-                    if (compareString(&v[i], "eight", 5)) {
-                        first = 8;
-                        break;
-                    }
-                    continue;
-                case 'n':
-                    if (compareString(&v[i], "nine", 4)) {
-                        first = 9;
-                        break;
-                    }
-                    continue;
-                default:
+                auto digit = getDigit(&v[i], first);
+
+                if (!digit) {
                     continue;
                 }
+                break;
 
                 last = first;   //Assume the last int is equal to the first int, before the second pass. 
                 break;
@@ -214,60 +230,11 @@ uint64_t ComputeCalibrationValues_Part2(const std::vector<std::string>& data) {
                     continue;   //the character is either uppercase or a special character
                 }
 
-                //Compare the string with potential values. 
-                switch (v[i]) {
-                case 'o':
-                    if (compareString(&v[i], "one", 3)) {
-                        last = 1;
-                        break;
-                    }
-                    continue;
-                case 't':
-                    if (compareString(&v[i], "two", 3)) {
-                        last = 2;
-                        break;
-                    }
-                    else if (compareString(&v[i], "three", 5)) {
-                        last = 3;
-                        break;
-                    }
-                    continue;
-                case 'f':
-                    if (compareString(&v[i], "four", 4)) {
-                        last = 4;
-                        break;
-                    }
-                    else if (compareString(&v[i], "five", 4)) {
-                        last = 5;
-                        break;
-                    }
-                    continue;
-                case 's':
-                    if (compareString(&v[i], "six", 3)) {
-                        last = 6;
-                        break;
-                    }
-                    else if (compareString(&v[i], "seven", 5)) {
-                        last = 7;
-                        break;
-                    }
-                    continue;
-                case 'e':
-                    if (compareString(&v[i], "eight", 5)) {
-                        last = 8;
-                        break;
-                    }
-                    continue;
-                case 'n':
-                    if (compareString(&v[i], "nine", 4)) {
-                        last = 9;
-                        break;
-                    }
-                    continue;
-                default:
+                const auto digit = getDigit(&v[i], last);
+
+                if(!digit){
                     continue;
                 }
-
                 break;
 
             }
