@@ -4,7 +4,7 @@
  *  https://adventofcode.com/2023/day/2
  *  ----------
  *  Created: 02-12-23    Ewan Burnett
- *  Revised: 02-12-23    Ewan Burnett
+ *  Revised: 03-12-23    Ewan Burnett
  */
 
 #include <cstdio>
@@ -69,59 +69,29 @@ uint64_t PossibleGames(const std::vector<std::string>& input) {
         };
 
         std::string_view v{input[i]};
-        //Remove the Game ID. 
-        v = v.substr(v.find_first_of(':') + 1, v.size());
+        size_t offset = v.find_first_of(':');
 
         //Extract each "game" 
+        while (offset < v.size()) {
 
-        size_t sz = v.find_first_of(';') + 1;
-        while (sz - 1 != 0) {
+            offset = v.find_first_of("1234567890", offset, 10); //Extract the number
+            auto number = std::atoi(v.data() + offset);
 
-            std::string_view game = v.substr(0, sz);
-            printf("Game: %.*s\n", game.length(), game.data());
+            //offset++;
+            offset = v.find_first_not_of(" ;1234567890", offset, 12);
 
-            //Compute how many times either red, green or blue was pulled. 
-            size_t offset = 0; 
-            size_t tokenLength = game.find_first_of(',') + 1;
-            while (offset < game.size()) {
-                std::string_view roll = game.substr(offset, tokenLength);
-                if (!roll.empty()) {
-                    size_t ws = roll.find_first_not_of(' ');
-                    if (ws) {   //Strip Whitespace
-                        roll = roll.substr(1, roll.size());
-                        offset++;
-                    }
-                    
-                    //Strip commas
-                    size_t cm = roll.find_first_of(',');
-                    if (cm) {
-                        roll = roll.substr(0, roll.size() - (roll.size() - cm));
-                        offset++; 
-                    }
+            auto colour = v.data() + offset; //Extract the colour
 
-                    //Rolls are in the format "[count] [colour]"
-                    std::string number{ roll.substr(0, roll.find_first_of(' ')) }; //roll.substr(0, roll.find_first_of(' ', offset));
-                    std::string colour{ roll.substr(roll.find_first_of(' ') + 1,  roll.size())};
-                    printf("%.*s = %.*s\n", colour.length(), colour.data(), number.length(), number.data());
+            auto len = v.find_first_not_of("abcdefghijklmnopqrstuvwxyz", offset, 26) - offset;      //Remove extra characters
 
-                    count[colour.c_str()] += std::stoi(number); //This way of extracting string data needs to be revised. 
-
-                    offset += tokenLength; 
-                    tokenLength = game.find_first_of(',') + 1;
-                }
-            }
-
-            for (const auto& val : g_CubeLimits) {
-                if (count[val.first] <= val.second) {
-                    acc += val.second; 
-                }
-            }
-
-            v.remove_prefix(sz - 1);
-            sz = v.find_first_of(';') + 1;
+            printf("col: %.*s, val: %d\n", len, colour, number);
+            offset += len;
+            
         }
-
         printf("--------\n");
+
+
+
     }
 
     return acc;
